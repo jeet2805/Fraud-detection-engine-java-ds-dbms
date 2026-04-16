@@ -1,21 +1,16 @@
-# Ralph Loop Task Tracker — Phase 4
+# Ralph Loop Task Tracker — Phase 5
 
-## Phase 4: Fraud Detection (COMPLETED)
+## Phase 5: Dashboards & RBAC (COMPLETED)
 
 ### Java Code
-- [x] Create FraudRule interface
-- [x] Implement LargeAmountRule (Flagged if > 50k)
-- [x] Implement VelocityRule (Flagged if > 5 txns in 60s)
-- [x] Implement CycleDetectionRule (Blocked if loop A->B->A detected)
-- [x] Implement NewAccountRule (Risk boost for < 24h accounts)
-- [x] Create FraudDetectionService (Aggregate rules via Stack)
-- [x] Create AlertDAO and AuditDAO
-- [x] Integrated Fraud Engine into TransactionService.transfer()
+- [x] Create AnalyticsService for system health
+- [x] Update AnalystMenu: Priority Alerts (Heap), Account Management
+- [x] Update AdminMenu: Rule Config, Audit Logs, Real-Time Stats
 
 ### Verification
-- [x] Integrated Rollback: Verified failed transfers don't change balances
-- [x] Verified Account Freeze logic on BLOCK
-- [x] Verified Audit Logging and Fraud Alert creation
-- [x] Integration test (FraudIntegrationTest) passed 100%
+- [x] RBAC Routing: Verified Admin/Analyst/Customer get correct dashboards
+- [x] Fraud Priority: Verified Heap correctly sorts risk scores in UI
+- [x] Rule Management: Verified Admin can update DB thresholds in real-time
+- [x] All JUnit & Integration tests passed (8/8)
 
-**Current Status**: Phase 4 Completed
+**Current Status**: Phase 5 Completed

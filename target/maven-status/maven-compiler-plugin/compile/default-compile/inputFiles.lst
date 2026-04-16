@@ -7,6 +7,7 @@ C:\Java-DS-Dbms\src\main\java\model\User.java
 C:\Java-DS-Dbms\src\main\java\service\FraudDetectionService.java
 C:\Java-DS-Dbms\src\main\java\Main.java
 C:\Java-DS-Dbms\src\main\java\model\Account.java
+C:\Java-DS-Dbms\src\main\java\service\AnalyticsService.java
 C:\Java-DS-Dbms\src\main\java\rules\NewAccountRule.java
 C:\Java-DS-Dbms\src\main\java\dao\AccountDAO.java
 C:\Java-DS-Dbms\src\main\java\rules\VelocityRule.java
