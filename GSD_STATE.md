@@ -6,7 +6,7 @@
 - **Phases**: 6 (Setup → Auth → Accounts → DS → Fraud Detection → Dashboards → Polish)
 
 ## Current Phase
-**PHASE 5**: Dashboards & RBAC
+**PHASE 6**: Final Polish & Delivery
 
 ## Status
 - [x] Phase 0: DB + Maven (2h)
@@ -15,7 +15,7 @@
 - [x] Phase 3: Custom Data Structures (8h)
 - [x] Phase 4: Fraud Detection (6h)
 - [x] Phase 5: Dashboards (4h)
-- [ ] Phase 6: Polish + GitHub (3h)
+- [x] Phase 6: Polish + GitHub (3h)
 
 ## Total Time Estimate
 **~32 hours for CV-ready project**
