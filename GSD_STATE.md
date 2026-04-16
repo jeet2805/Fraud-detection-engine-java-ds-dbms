@@ -9,7 +9,7 @@
 **PHASE 0**: Setup & Database
 
 ## Status
-- [ ] Phase 0: DB + Maven (2h)
+- [x] Phase 0: DB + Maven (2h)
 - [ ] Phase 1: Auth System (4h)
 - [ ] Phase 2: Accounts & Transfers (5h)
 - [ ] Phase 3: Custom Data Structures (8h)

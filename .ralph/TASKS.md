@@ -26,4 +26,4 @@
 - [x] All views created
 - [x] Trigger working
 
-**Current Status**: Ready to start (all DB setup tasks not checked yet)
+**Current Status**: Phase 0 Completed
