@@ -1,19 +1,18 @@
-# Ralph Loop Task Tracker — Phase 2
+# Ralph Loop Task Tracker — Phase 3
 
-## Phase 2: Accounts & Transfers (COMPLETED)
+## Phase 3: Custom Data Structures (COMPLETED)
 
 ### Java Code
-- [x] Create Account.java model
-- [x] Create Transaction.java model
-- [x] Create AccountDAO.java (findByUserId, updateBalance)
-- [x] Create TransactionDAO.java (insertTransaction, getRecentByAccount)
-- [x] Implement TransactionService (deposit, transfer, statement)
-- [x] Implement CustomerMenu (full logic for balance, deposit, transfer, statement)
+- [x] Build TransactionGraph.java (DFS cycle detection)
+- [x] Build MinHeap.java (Max-Heap for risk scores)
+- [x] Build SlidingWindowDeque.java (Doubly Linked List)
+- [x] Build RuleEngineStack.java (Array-based stack)
 
 ### Verification
-- [x] JUnit test for Deposit/Transfer/Statement flows passed
-- [x] Balance updates verified in DB via tests
-- [x] Transaction history entries verified in DB via tests
-- [x] ACID Rollback logic implemented in Service layer
+- [x] JUnit test for Graph: cycle detection true/false
+- [x] JUnit test for Heap: Max priority ordering
+- [x] JUnit test for Deque: sliding window ejection
+- [x] JUnit test for Stack: LIFO behavior
+- [x] mvn test passes 100% (7/7 tests)
 
-**Current Status**: Phase 2 Completed
+**Current Status**: Phase 3 Completed
