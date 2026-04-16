@@ -1,20 +1,19 @@
-# Ralph Loop Task Tracker — Phase 1
+# Ralph Loop Task Tracker — Phase 2
 
-## Phase 1: Authentication (COMPLETED)
+## Phase 2: Accounts & Transfers (COMPLETED)
 
 ### Java Code
-- [x] Create User.java model
-- [x] Create UserDAO.java with findByUsername, insertUser
-- [x] Create AuthService.java with SHA-256 hashing
-- [x] Create SessionManager.java (static currentUser)
-- [x] Create AuthMenu.java (login/signup loop)
-- [x] Create Main.java entry point
-- [x] Create stub menus: CustomerMenu, AnalystMenu, AdminMenu
+- [x] Create Account.java model
+- [x] Create Transaction.java model
+- [x] Create AccountDAO.java (findByUserId, updateBalance)
+- [x] Create TransactionDAO.java (insertTransaction, getRecentByAccount)
+- [x] Implement TransactionService (deposit, transfer, statement)
+- [x] Implement CustomerMenu (full logic for balance, deposit, transfer, statement)
 
 ### Verification
-- [x] Test login with 3 users (customer, analyst, admin)
-- [x] Verify login_log table has entries
-- [x] Verify passwords hashed in DB
-- [x] All JUnit tests passed successfully
+- [x] JUnit test for Deposit/Transfer/Statement flows passed
+- [x] Balance updates verified in DB via tests
+- [x] Transaction history entries verified in DB via tests
+- [x] ACID Rollback logic implemented in Service layer
 
-**Current Status**: Phase 1 Completed
+**Current Status**: Phase 2 Completed
