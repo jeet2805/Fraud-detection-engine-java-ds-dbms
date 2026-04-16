@@ -38,6 +38,12 @@ public class AccountDAO {
         return null;
     }
 
+    public Account findById(int accountId) throws SQLException {
+        try (Connection conn = DBConnection.getConnection()) {
+            return findById(accountId, conn);
+        }
+    }
+
     public Account findByUserId(int userId, Connection conn) throws SQLException {
         String sql = "SELECT * FROM accounts WHERE user_id = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -56,6 +62,12 @@ public class AccountDAO {
             }
         }
         return null;
+    }
+
+    public Account findByUserId(int userId) throws SQLException {
+        try (Connection conn = DBConnection.getConnection()) {
+            return findByUserId(userId, conn);
+        }
     }
 
     public void updateBalance(int accountId, BigDecimal amount, Connection conn) throws SQLException {
