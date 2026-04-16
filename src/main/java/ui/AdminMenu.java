@@ -64,42 +64,50 @@ public class AdminMenu {
 
     private void manageRules() throws SQLException {
         System.out.println("\n--- Fraud Rule Configuration ---");
-        String sql = "SELECT rule_id, rule_name, threshold, is_active FROM rule_config";
+        String sql = "SELECT rule_name, threshold, is_active FROM rule_config";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
-                System.out.printf("[%d] %s | Threshold: %.2f | Active: %b%n",
-                    rs.getInt("rule_id"), rs.getString("rule_name"),
+                System.out.printf("Rule: %s | Threshold: %.2f | Active: %b%n",
+                    rs.getString("rule_name"),
                     rs.getBigDecimal("threshold"), rs.getBoolean("is_active"));
             }
         }
         
-        System.out.print("Enter Rule ID to update threshold (0 to cancel): ");
-        int rid = Integer.parseInt(scanner.nextLine());
-        if (rid > 0) {
-            System.out.print("Enter NEW threshold value: ");
-            double newVal = Double.parseDouble(scanner.nextLine());
-            String updateSql = "UPDATE rule_config SET threshold = ? WHERE rule_id = ?";
-            try (Connection conn = DBConnection.getConnection();
-                 PreparedStatement pstmt = conn.prepareStatement(updateSql)) {
-                pstmt.setDouble(1, newVal);
-                pstmt.setInt(2, rid);
-                pstmt.executeUpdate();
-                System.out.println("Rule updated successfully.");
+        System.out.print("Enter Rule Name to update threshold (Enter to cancel): ");
+        String rName = scanner.nextLine().trim().toUpperCase();
+        if (!rName.isEmpty()) {
+            try {
+                System.out.print("Enter NEW threshold value: ");
+                double newVal = Double.parseDouble(scanner.nextLine());
+                String updateSql = "UPDATE rule_config SET threshold = ? WHERE rule_name = ?";
+                try (Connection conn = DBConnection.getConnection();
+                     PreparedStatement pstmt = conn.prepareStatement(updateSql)) {
+                    pstmt.setDouble(1, newVal);
+                    pstmt.setString(2, rName);
+                    int rows = pstmt.executeUpdate();
+                    if (rows > 0) {
+                        System.out.println("Rule updated successfully.");
+                    } else {
+                        System.out.println("Error: Rule '" + rName + "' not found.");
+                    }
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Error: Threshold must be a numeric value.");
             }
         }
     }
 
     private void showAuditLog() throws SQLException {
         System.out.println("\n--- System Audit Log (LIFO) ---");
-        String sql = "SELECT * FROM audit_log ORDER BY timestamp DESC LIMIT 20";
+        String sql = "SELECT * FROM audit_log ORDER BY logged_at DESC LIMIT 20";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
                 System.out.printf("[%s] Action: %s | Entity: %s#%d | Reason: %s%n",
-                    rs.getTimestamp("timestamp"), rs.getString("action"), 
+                    rs.getTimestamp("logged_at"), rs.getString("action"), 
                     rs.getString("entity_type"), rs.getInt("entity_id"), rs.getString("reason"));
             }
         }

@@ -58,7 +58,7 @@ public class AnalystMenu {
         // We use the MinHeap (Max-Priority logic) to sort alerts by risk score
         MinHeap heap = new MinHeap(100);
         
-        String sql = "SELECT risk_score FROM fraud_alerts WHERE status = 'PENDING'";
+        String sql = "SELECT risk_score FROM fraud_alerts WHERE reviewed = FALSE";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
@@ -105,10 +105,18 @@ public class AnalystMenu {
         }
         
         System.out.print("Enter Account ID to UNFREEZE (or 0 to go back): ");
-        int accId = Integer.parseInt(scanner.nextLine());
-        if (accId > 0) {
-            accountDAO.updateStatus(accId, "ACTIVE");
-            System.out.println("Account # " + accId + " has been UNROZEN.");
+        try {
+            int accId = Integer.parseInt(scanner.nextLine());
+            if (accId > 0) {
+                int rows = accountDAO.updateStatus(accId, "ACTIVE");
+                if (rows > 0) {
+                    System.out.println("Account #" + accId + " has been UNFROZEN.");
+                } else {
+                    System.out.println("Error: Account #" + accId + " was not found or is not frozen.");
+                }
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Error: Account ID must be a numeric value.");
         }
     }
 }

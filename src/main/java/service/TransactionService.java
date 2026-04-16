@@ -34,6 +34,10 @@ public class TransactionService {
 
     public boolean deposit(int accountId, BigDecimal amount) {
         if (amount.compareTo(BigDecimal.ZERO) <= 0) return false;
+        if (amount.compareTo(new BigDecimal("100000.00")) > 0) {
+            System.out.println("Deposit rejected: Amount exceeds single deposit limit ($100,000).");
+            return false;
+        }
         
         Connection conn = null;
         try {
@@ -63,9 +67,15 @@ public class TransactionService {
             conn.setAutoCommit(false);
 
             Account sender = accountDAO.findByUserId(fromUserId);
+            Account recipient = accountDAO.findById(toAccountId);
+
             if (sender == null || sender.getBalance().compareTo(amount) < 0 || "FROZEN".equals(sender.getStatus())) {
-                System.out.println("Transfer rejected: Account not found, insufficient funds, or frozen.");
+                System.out.println("Transfer rejected: Sender account not found, insufficient funds, or frozen.");
                 return false; 
+            }
+            if (recipient == null) {
+                System.out.println("Transfer rejected: Recipient Account ID #" + toAccountId + " does not exist.");
+                return false;
             }
 
             // Create temporary transaction object for evaluation
@@ -80,7 +90,8 @@ public class TransactionService {
                 System.out.println("!!! TRANSACTION BLOCKED: Extreme Risk (" + riskScore + ") !!!");
                 auditDAO.logAction("BLOCK", "ACCOUNT", sender.getAccountId(), fromUserId, "Risk Score: " + riskScore, conn);
                 accountDAO.updateStatus(sender.getAccountId(), "FROZEN");
-                transactionDAO.insertTransaction(sender.getAccountId(), toAccountId, amount, "TRANSFER", "ROLLED_BACK", conn);
+                int txnId = transactionDAO.insertTransaction(sender.getAccountId(), toAccountId, amount, "TRANSFER", "ROLLED_BACK", conn);
+                alertDAO.insertAlert(txnId, "CRITICAL_RISK_BLOCK", riskScore, conn);
                 conn.commit(); // Save the block/freeze/log even though money didn't move
                 return false;
             } else if (riskScore >= 30) {
@@ -112,6 +123,10 @@ public class TransactionService {
 
     public List<Transaction> getStatement(int accountId) throws SQLException {
         return transactionDAO.getRecentByAccount(accountId, 10);
+    }
+
+    public List<String> getAlerts(int accountId) throws SQLException {
+        return alertDAO.getAlertsByAccount(accountId);
     }
 
     private void rollback(Connection conn) {

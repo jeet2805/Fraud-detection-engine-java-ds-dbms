@@ -18,10 +18,29 @@ public class AccountDAO {
         }
     }
 
-    public Account findByUserId(int userId) throws SQLException {
+    public Account findById(int accountId, Connection conn) throws SQLException {
+        String sql = "SELECT * FROM accounts WHERE account_id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, accountId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new Account(
+                        rs.getInt("account_id"),
+                        rs.getInt("user_id"),
+                        rs.getString("holder_name"),
+                        rs.getBigDecimal("balance"),
+                        rs.getString("status"),
+                        rs.getTimestamp("created_at")
+                    );
+                }
+            }
+        }
+        return null;
+    }
+
+    public Account findByUserId(int userId, Connection conn) throws SQLException {
         String sql = "SELECT * FROM accounts WHERE user_id = ?";
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, userId);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
@@ -48,13 +67,18 @@ public class AccountDAO {
         }
     }
 
-    public void updateStatus(int accountId, String status) throws SQLException {
+    public int updateStatus(int accountId, String status, Connection conn) throws SQLException {
         String sql = "UPDATE accounts SET status = ? WHERE account_id = ?";
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, status);
             stmt.setInt(2, accountId);
-            stmt.executeUpdate();
+            return stmt.executeUpdate();
+        }
+    }
+
+    public void updateStatus(int accountId, String status) throws SQLException {
+        try (Connection conn = DBConnection.getConnection()) {
+            updateStatus(accountId, status, conn);
         }
     }
 }

@@ -87,16 +87,12 @@ public class AuthMenu {
             switch (user.getRole()) {
                 case "CUSTOMER":
                     new CustomerMenu().display();
-                    // Auto logout after stub displays to avoid infinite loops for now
-                    SessionManager.logout();
                     break;
                 case "ANALYST":
                     new AnalystMenu().display();
-                    SessionManager.logout();
                     break;
                 case "ADMIN":
                     new AdminMenu().display();
-                    SessionManager.logout();
                     break;
                 default:
                     System.out.println("Unknown role.");

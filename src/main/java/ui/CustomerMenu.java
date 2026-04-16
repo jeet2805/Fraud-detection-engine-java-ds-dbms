@@ -78,7 +78,15 @@ public class CustomerMenu {
                         }
                         break;
                     case "5":
-                        System.out.println("No alerts found."); // Implementing later in Phase 4
+                        System.out.println("--- Your Security Alerts ---");
+                        List<String> alerts = txnService.getAlerts(account.getAccountId());
+                        if (alerts.isEmpty()) {
+                            System.out.println("No security alerts. Your account is safe.");
+                        } else {
+                            for (String alert : alerts) {
+                                System.out.println(alert);
+                            }
+                        }
                         break;
                     case "6":
                         SessionManager.logout();

@@ -1,0 +1,4 @@
+ds\DataStructureTest.class
+service\AuthServiceTest.class
+integration\FraudIntegrationTest.class
+service\TransactionServiceTest.class
