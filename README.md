@@ -54,4 +54,44 @@ graph TD
 | **Cycle Loop** | 80 | Detects A -> B -> A money laundering |
 
 ---
-**Build with ❤️ by Antigravity AI Engine.**
+To let someone else run this project on your computer, they follow these 4 easy steps.
+
+📋 Prerequisites
+They need these 3 things installed (which you already have):
+
+Java 17+ (JDK)
+PostgreSQL (Database)
+Maven (Build Tool)
+Step 1: Database Setup
+Make sure the PostgreSQL server is running. If they haven't set up the DB yet, they must run these commands in their terminal:
+
+bash
+# Log in to Postgres and create the database
+psql -U postgres -c "CREATE DATABASE fraud_engine;"
+# Import the schema from your project folder
+psql -U postgres -d fraud_engine -f c:/Java-DS-Dbms/sql/schema.sql
+Step 2: Build the Project
+In the project root directory (c:\Java-DS-Dbms), run this command to download dependencies and compile everything:
+
+bash
+mvn clean compile
+Step 3: Verify with Tests (Optional but Recommended)
+To prove the Fraud Engine is working perfectly on their machine:
+
+bash
+mvn test
+Step 4: Run the Application
+Finally, they can launch the terminal UI with this command:
+
+bash
+mvn exec:java -Dexec.mainClass="Main"
+💡 Quick Summary for them:
+Command	What it does
+mvn clean compile	Prepares the code for execution
+mvn test	Runs the Fraud Engine against 8 security tests
+mvn exec:java -Dexec.mainClass="Main"	Starts the App
+They can then log in as:
+
+Customer: To send money and trigger fraud rules.
+Analyst: To review high-priority heap-sorted alerts.
+Admin: To change the system thresholds (like the 50k limit).
