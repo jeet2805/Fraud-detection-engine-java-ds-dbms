@@ -6,11 +6,11 @@
 - **Phases**: 6 (Setup → Auth → Accounts → DS → Fraud Detection → Dashboards → Polish)
 
 ## Current Phase
-**PHASE 0**: Setup & Database
+**PHASE 1**: Auth System
 
 ## Status
 - [x] Phase 0: DB + Maven (2h)
-- [ ] Phase 1: Auth System (4h)
+- [x] Phase 1: Auth System (4h)
 - [ ] Phase 2: Accounts & Transfers (5h)
 - [ ] Phase 3: Custom Data Structures (8h)
 - [ ] Phase 4: Fraud Detection (6h)

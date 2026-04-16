@@ -1,29 +1,20 @@
-# Ralph Loop Task Tracker — Phase 0
+# Ralph Loop Task Tracker — Phase 1
 
-## Phase 0: Setup & Database (START HERE)
-
-### Database Schema
-- [x] Create users table
-- [x] Create accounts table
-- [x] Create transactions table
-- [x] Create fraud_alerts table
-- [x] Create audit_log table
-- [x] Create rule_config table
-- [x] Create login_log table
-- [x] Create flagged_transactions_view
-- [x] Create daily_volume_view
-- [x] Create auto_freeze_account trigger
-- [x] Insert seed data into rule_config
+## Phase 1: Authentication (COMPLETED)
 
 ### Java Code
-- [x] Create DBConnection.java (Singleton)
-- [x] Test JDBC connection with SELECT 1
-- [x] Verify Maven pom.xml is correct
+- [x] Create User.java model
+- [x] Create UserDAO.java with findByUsername, insertUser
+- [x] Create AuthService.java with SHA-256 hashing
+- [x] Create SessionManager.java (static currentUser)
+- [x] Create AuthMenu.java (login/signup loop)
+- [x] Create Main.java entry point
+- [x] Create stub menus: CustomerMenu, AnalystMenu, AdminMenu
 
 ### Verification
-- [x] mvn clean compile succeeds
-- [x] pgAdmin shows 7 tables
-- [x] All views created
-- [x] Trigger working
+- [x] Test login with 3 users (customer, analyst, admin)
+- [x] Verify login_log table has entries
+- [x] Verify passwords hashed in DB
+- [x] All JUnit tests passed successfully
 
-**Current Status**: Phase 0 Completed
+**Current Status**: Phase 1 Completed

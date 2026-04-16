@@ -1,2 +1,11 @@
 C:\Java-DS-Dbms\src\main\java\db\DBConnection.java
+C:\Java-DS-Dbms\src\main\java\dao\AccountDAO.java
+C:\Java-DS-Dbms\src\main\java\model\User.java
+C:\Java-DS-Dbms\src\main\java\ui\CustomerMenu.java
+C:\Java-DS-Dbms\src\main\java\service\AuthService.java
 C:\Java-DS-Dbms\src\main\java\Main.java
+C:\Java-DS-Dbms\src\main\java\ui\AdminMenu.java
+C:\Java-DS-Dbms\src\main\java\ui\AuthMenu.java
+C:\Java-DS-Dbms\src\main\java\ui\SessionManager.java
+C:\Java-DS-Dbms\src\main\java\dao\UserDAO.java
+C:\Java-DS-Dbms\src\main\java\ui\AnalystMenu.java
