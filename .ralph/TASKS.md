@@ -1,18 +1,21 @@
-# Ralph Loop Task Tracker — Phase 3
+# Ralph Loop Task Tracker — Phase 4
 
-## Phase 3: Custom Data Structures (COMPLETED)
+## Phase 4: Fraud Detection (COMPLETED)
 
 ### Java Code
-- [x] Build TransactionGraph.java (DFS cycle detection)
-- [x] Build MinHeap.java (Max-Heap for risk scores)
-- [x] Build SlidingWindowDeque.java (Doubly Linked List)
-- [x] Build RuleEngineStack.java (Array-based stack)
+- [x] Create FraudRule interface
+- [x] Implement LargeAmountRule (Flagged if > 50k)
+- [x] Implement VelocityRule (Flagged if > 5 txns in 60s)
+- [x] Implement CycleDetectionRule (Blocked if loop A->B->A detected)
+- [x] Implement NewAccountRule (Risk boost for < 24h accounts)
+- [x] Create FraudDetectionService (Aggregate rules via Stack)
+- [x] Create AlertDAO and AuditDAO
+- [x] Integrated Fraud Engine into TransactionService.transfer()
 
 ### Verification
-- [x] JUnit test for Graph: cycle detection true/false
-- [x] JUnit test for Heap: Max priority ordering
-- [x] JUnit test for Deque: sliding window ejection
-- [x] JUnit test for Stack: LIFO behavior
-- [x] mvn test passes 100% (7/7 tests)
+- [x] Integrated Rollback: Verified failed transfers don't change balances
+- [x] Verified Account Freeze logic on BLOCK
+- [x] Verified Audit Logging and Fraud Alert creation
+- [x] Integration test (FraudIntegrationTest) passed 100%
 
-**Current Status**: Phase 3 Completed
+**Current Status**: Phase 4 Completed
