@@ -1,0 +1,24 @@
+{
+  "coderabbit": {
+    "language": "java",
+    "mode": "strict",
+    "rules": {
+      "style": {
+        "enforce_naming_conventions": true,
+        "enforce_javadoc": false,
+        "max_line_length": 100
+      },
+      "security": {
+        "check_sql_injection": true,
+        "check_hardcoded_secrets": true
+      }
+    },
+    "codebase_guidelines": [
+      "Use raw JDBC only — no Hibernate",
+      "Custom data structures — no java.util",
+      "All SQL in dao/ package",
+      "Singleton for DBConnection",
+      "ACID compliance with transactions"
+    ]
+  }
+}
