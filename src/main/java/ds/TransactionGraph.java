@@ -3,6 +3,9 @@ package ds;
 /**
  * Custom Adjacency List Graph for Cycle Detection (A -> B -> C -> A)
  * Built without java.util for core logic.
+ * 
+ * IMPORTANT: capacity must be >= max(account_id) + 1
+ * so that getIndex(id) == id, eliminating hash collisions.
  */
 public class TransactionGraph {
     private static class EdgeNode {
@@ -24,7 +27,8 @@ public class TransactionGraph {
     }
 
     private int getIndex(int accountId) {
-        return accountId % capacity;
+        // When capacity > max(account_id), this is just accountId
+        return Math.abs(accountId % capacity);
     }
 
     public void addEdge(int fromId, int toId) {
@@ -40,8 +44,8 @@ public class TransactionGraph {
 
     private boolean dfs(int current, boolean[] visited, boolean[] recStack) {
         int idx = getIndex(current);
-        if (recStack[idx]) return true;
-        if (visited[idx]) return false;
+        if (recStack[idx]) return true;   // Back-edge found = cycle
+        if (visited[idx]) return false;   // Already fully explored
 
         visited[idx] = true;
         recStack[idx] = true;

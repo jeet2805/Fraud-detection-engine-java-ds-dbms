@@ -88,9 +88,33 @@ public class AccountDAO {
         }
     }
 
-    public void updateStatus(int accountId, String status) throws SQLException {
+    public int updateStatus(int accountId, String status) throws SQLException {
         try (Connection conn = DBConnection.getConnection()) {
-            updateStatus(accountId, status, conn);
+            return updateStatus(accountId, status, conn);
+        }
+    }
+
+    public int updateStatus(int accountId, String status, String currentStatus) throws SQLException {
+        String sql = "UPDATE accounts SET status = ? WHERE account_id = ? AND status = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, status);
+            stmt.setInt(2, accountId);
+            stmt.setString(3, currentStatus);
+            return stmt.executeUpdate();
+        }
+    }
+
+    public void listAllAccounts() throws SQLException {
+        String sql = "SELECT account_id, holder_name, status FROM accounts ORDER BY account_id";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            System.out.println("\n--- All System Accounts ---");
+            while (rs.next()) {
+                System.out.printf("Account ID: %d | Holder: %s | Status: %s%n",
+                    rs.getInt("account_id"), rs.getString("holder_name"), rs.getString("status"));
+            }
         }
     }
 }

@@ -92,6 +92,7 @@ public class AuthService {
             if (conn != null) {
                 try {
                     conn.setAutoCommit(true);
+                    conn.close();
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }

@@ -58,12 +58,14 @@ public class CustomerMenu {
                             System.out.println("Your account is frozen. Transfers are blocked.");
                             break;
                         }
-                        System.out.print("Enter recipient Account ID: ");
+                        System.out.print("Enter recipient ACCOUNT ID (not User ID): ");
                         int toAccountId = Integer.parseInt(scanner.nextLine());
                         System.out.print("Enter amount to transfer: ");
                         BigDecimal transferAmount = new BigDecimal(scanner.nextLine());
                         if (txnService.transfer(userId, toAccountId, transferAmount)) {
                             System.out.println("Transfer successful!");
+                            // Re-fetch account to show updated balance in the next loop or immediate refresh
+                            account = txnService.getAccountByUserId(userId);
                         } else {
                             System.out.println("Transfer failed. Check balance or account ID.");
                         }

@@ -32,7 +32,11 @@ public class TransactionDAO {
 
     public List<Transaction> getRecentByAccount(int accountId, int limit) throws SQLException {
         List<Transaction> transactions = new ArrayList<>();
-        String sql = "SELECT * FROM transactions WHERE from_account = ? OR to_account = ? ORDER BY timestamp DESC LIMIT ?";
+        // Show ALL transactions involving this account (sent OR received)
+        // Exclude NULL comparisons: use IS NOT DISTINCT FROM to be safe with NULLs
+        String sql = "SELECT * FROM transactions " +
+                     "WHERE from_account = ? OR to_account = ? " +
+                     "ORDER BY timestamp DESC LIMIT ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, accountId);

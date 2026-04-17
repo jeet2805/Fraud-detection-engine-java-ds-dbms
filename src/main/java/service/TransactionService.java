@@ -34,20 +34,55 @@ public class TransactionService {
 
     public boolean deposit(int accountId, BigDecimal amount) {
         if (amount.compareTo(BigDecimal.ZERO) <= 0) return false;
-        if (amount.compareTo(new BigDecimal("100000.00")) > 0) {
-            System.out.println("Deposit rejected: Amount exceeds single deposit limit ($100,000).");
-            return false;
-        }
         
         Connection conn = null;
         try {
             conn = DBConnection.getConnection();
             conn.setAutoCommit(false);
 
+            Account account = accountDAO.findById(accountId, conn);
+            if (account == null) {
+                System.out.println("Deposit rejected: Account not found.");
+                return false;
+            }
+
+            // 1. Evaluate Fraud
+            Transaction probe = new Transaction(0, -1, accountId, amount, "DEPOSIT", "PENDING", null);
+            int riskScore = fraudService.evaluate(probe, conn);
+            
+            String finalStatus = "SUCCESS";
+
+            if (riskScore >= 70) {
+                // BLOCK
+                finalStatus = "ROLLED_BACK";
+                System.out.println("!!! DEPOSIT BLOCKED: Risk Score " + riskScore + " !!!");
+                
+                // Freeze account
+                accountDAO.updateStatus(accountId, "FROZEN", "ACTIVE");
+                auditDAO.logAction("FREEZE", "ACCOUNT", accountId, -1, "Blocked deposit risk: " + riskScore, conn);
+                
+                // Record attempt
+                int tid = transactionDAO.insertTransaction(-1, accountId, amount, "DEPOSIT", finalStatus, conn);
+                alertDAO.insertAlert(tid, "FRAUD_BLOCK_DEPOSIT", riskScore, conn);
+                
+                conn.commit();
+                return false;
+            } else if (riskScore >= 30) {
+                finalStatus = "FLAGGED";
+            }
+
+            // 2. Execute
             accountDAO.updateBalance(accountId, amount, conn);
-            transactionDAO.insertTransaction(-1, accountId, amount, "DEPOSIT", "SUCCESS", conn);
+            int tid = transactionDAO.insertTransaction(-1, accountId, amount, "DEPOSIT", finalStatus, conn);
+            
+            if (finalStatus.equals("FLAGGED")) {
+                alertDAO.insertAlert(tid, "DEPOSIT_FLAG", riskScore, conn);
+            }
 
             conn.commit();
+            if (finalStatus.equals("FLAGGED")) {
+                System.out.println("Deposit " + tid + " flagged with status: FLAGGED (Risk: " + riskScore + ")");
+            }
             return true;
         } catch (SQLException e) {
             rollback(conn);
@@ -60,61 +95,82 @@ public class TransactionService {
 
     public boolean transfer(int fromUserId, int toAccountId, BigDecimal amount) {
         if (amount.compareTo(BigDecimal.ZERO) <= 0) return false;
-        
+
         Connection conn = null;
         try {
             conn = DBConnection.getConnection();
             conn.setAutoCommit(false);
 
-            Account sender = accountDAO.findByUserId(fromUserId);
-            Account recipient = accountDAO.findById(toAccountId);
+            // Fetch SHARP data within the transaction
+            Account sender = accountDAO.findByUserId(fromUserId, conn);
+            Account recipient = accountDAO.findById(toAccountId, conn);
 
-            if (sender == null || sender.getBalance().compareTo(amount) < 0 || "FROZEN".equals(sender.getStatus())) {
-                System.out.println("Transfer rejected: Sender account not found, insufficient funds, or frozen.");
-                return false; 
+            // Validations
+            if (sender == null) {
+                System.out.println("Transfer rejected: Sender account not found.");
+                return false;
+            }
+            if ("FROZEN".equals(sender.getStatus())) {
+                System.out.println("Transfer rejected: Your account is FROZEN.");
+                return false;
+            }
+            if (sender.getBalance().compareTo(amount) < 0) {
+                System.out.println("Transfer rejected: Insufficient funds (Balance: $" + sender.getBalance() + ")");
+                return false;
             }
             if (recipient == null) {
-                System.out.println("Transfer rejected: Recipient Account ID #" + toAccountId + " does not exist.");
+                System.out.println("Transfer rejected: Recipient ID #" + toAccountId + " not found.");
+                return false;
+            }
+            if (sender.getAccountId() == recipient.getAccountId()) {
+                System.out.println("Transfer rejected: Cannot transfer to yourself.");
                 return false;
             }
 
-            // Create temporary transaction object for evaluation
-            Transaction tempTxn = new Transaction(0, sender.getAccountId(), toAccountId, amount, "TRANSFER", "PENDING", null);
-
-            // Step 1: Fraud Evaluation
-            int riskScore = fraudService.evaluate(tempTxn, conn);
-            String status = "SUCCESS";
+            // 1. Evaluate Fraud
+            Transaction probe = new Transaction(0, sender.getAccountId(), toAccountId, amount, "TRANSFER", "PENDING", null);
+            int riskScore = fraudService.evaluate(probe, conn);
+            
+            String finalStatus = "SUCCESS";
 
             if (riskScore >= 70) {
                 // BLOCK
-                System.out.println("!!! TRANSACTION BLOCKED: Extreme Risk (" + riskScore + ") !!!");
-                auditDAO.logAction("BLOCK", "ACCOUNT", sender.getAccountId(), fromUserId, "Risk Score: " + riskScore, conn);
-                accountDAO.updateStatus(sender.getAccountId(), "FROZEN");
-                int txnId = transactionDAO.insertTransaction(sender.getAccountId(), toAccountId, amount, "TRANSFER", "ROLLED_BACK", conn);
-                alertDAO.insertAlert(txnId, "CRITICAL_RISK_BLOCK", riskScore, conn);
-                conn.commit(); // Save the block/freeze/log even though money didn't move
+                finalStatus = "ROLLED_BACK";
+                System.out.println("!!! BLOCKED: Risk Score " + riskScore + " !!!");
+                
+                // Freeze sender
+                accountDAO.updateStatus(sender.getAccountId(), "FROZEN", conn);
+                auditDAO.logAction("FREEZE", "ACCOUNT", sender.getAccountId(), fromUserId, "Blocked txn risk: " + riskScore, conn);
+                
+                // Record the failed attempt
+                int tid = transactionDAO.insertTransaction(sender.getAccountId(), toAccountId, amount, "TRANSFER", finalStatus, conn);
+                alertDAO.insertAlert(tid, "FRAUD_BLOCK", riskScore, conn);
+                
+                conn.commit();
                 return false;
             } else if (riskScore >= 30) {
-                // FLAG
-                status = "FLAGGED";
-                System.out.println("??? TRANSACTION FLAGGED: Risk Score " + riskScore + " ???");
+                // FLAG but proceed
+                finalStatus = "FLAGGED";
             }
 
-            // Step 2: Execution
+            // 2. Execute Balances
             accountDAO.updateBalance(sender.getAccountId(), amount.negate(), conn);
-            accountDAO.updateBalance(toAccountId, amount, conn);
-            int txnId = transactionDAO.insertTransaction(sender.getAccountId(), toAccountId, amount, "TRANSFER", status, conn);
-
-            // Step 3: Alerts
-            if (status.equals("FLAGGED")) {
-                alertDAO.insertAlert(txnId, "MULTIPLE_RULES", riskScore, conn);
+            accountDAO.updateBalance(recipient.getAccountId(), amount, conn);
+            
+            // 3. Record Transaction
+            int tid = transactionDAO.insertTransaction(sender.getAccountId(), toAccountId, amount, "TRANSFER", finalStatus, conn);
+            
+            if (finalStatus.equals("FLAGGED")) {
+                alertDAO.insertAlert(tid, "MULTIPLE_RULES", riskScore, conn);
             }
 
             conn.commit();
+            System.out.println("Transaction " + tid + " committed with status: " + finalStatus);
             return true;
+            
         } catch (SQLException e) {
+            System.err.println("Database Error during transfer: " + e.getMessage());
             rollback(conn);
-            e.printStackTrace();
             return false;
         } finally {
             closeConnection(conn);
@@ -131,18 +187,15 @@ public class TransactionService {
 
     private void rollback(Connection conn) {
         if (conn != null) {
-            try {
-                conn.rollback();
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
+            try { conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
         }
     }
 
     private void closeConnection(Connection conn) {
         if (conn != null) {
             try {
-                conn.setAutoCommit(true);
+                conn.setAutoCommit(true); // Reset for pool safety
+                conn.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }

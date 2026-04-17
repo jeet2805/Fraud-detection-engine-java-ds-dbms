@@ -42,9 +42,9 @@ public class AuthMenu {
 
     private void handleLogin() {
         System.out.print("Username: ");
-        String username = scanner.nextLine();
+        String username = scanner.nextLine().trim();
         System.out.print("Password: ");
-        String password = scanner.nextLine();
+        String password = scanner.nextLine().trim();
 
         try {
             User user = authService.login(username, password);
@@ -62,11 +62,11 @@ public class AuthMenu {
 
     private void handleSignup() {
         System.out.print("Username: ");
-        String username = scanner.nextLine();
+        String username = scanner.nextLine().trim();
         System.out.print("Password: ");
-        String password = scanner.nextLine();
+        String password = scanner.nextLine().trim();
         System.out.print("Role (CUSTOMER/ANALYST/ADMIN): ");
-        String role = scanner.nextLine().toUpperCase();
+        String role = scanner.nextLine().toUpperCase().trim();
 
         if (!role.equals("CUSTOMER") && !role.equals("ANALYST") && !role.equals("ADMIN")) {
             System.out.println("Invalid role selected. Must be CUSTOMER, ANALYST, or ADMIN.");
